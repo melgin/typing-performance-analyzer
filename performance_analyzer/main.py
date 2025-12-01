@@ -32,6 +32,7 @@ def calculate_metrics(sequence:list):
     typing_speed_calculator = TypingSpeedCalculator(sequence)
 
     print('WPM: ', typing_speed_calculator.wpm(interrupted_time=0))
+    print('KSPS:', typing_speed_calculator.ksps(interrupted_time=0))
 
 
 if __name__ == "__main__":

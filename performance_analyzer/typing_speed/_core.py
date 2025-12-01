@@ -27,6 +27,17 @@ class TypingSpeedCalculator:
         duration = self.duration - (interrupted_time / MILLISECONDS)
         return (final_character_count - 1) / duration * WORD_PER_MINUTE
 
+    def ksps(self, interrupted_time:int = 0) -> float:
+        """
+        KSPS (keystrokes per second) is the number of keystrokes made in a second.
+        It is useful when taking error corrections into account.
+
+        :param interrupted_time: any interrupted time during the session (received calls or switching to another app)
+        :return: calculated ksps value
+        """
+        duration = self.duration - (interrupted_time / MILLISECONDS)
+        return (len(self.data_list) - 1) / duration
+
     def get_duration(self):
         """
 
