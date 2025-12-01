@@ -1,3 +1,4 @@
+from performance_analyzer.error_rate import ErrorRateCalculator
 from utils.json import JsonUtil
 from typing_speed import TypingSpeedCalculator
 
@@ -30,9 +31,12 @@ def main():
 
 def calculate_metrics(sequence:list):
     typing_speed_calculator = TypingSpeedCalculator(sequence)
+    error_rate_calculator = ErrorRateCalculator(sequence)
 
     print('WPM: ', typing_speed_calculator.wpm(interrupted_time=0))
     print('KSPS:', typing_speed_calculator.ksps(interrupted_time=0))
+    print('KSPC:', error_rate_calculator.kspc(additional_characters=0))
+    print('Duration:', typing_speed_calculator.get_duration(), 'seconds')
 
 
 if __name__ == "__main__":
