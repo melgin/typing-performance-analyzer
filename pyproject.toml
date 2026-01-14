@@ -7,4 +7,4 @@ readme = "README.md"
 requires-python = ">=3.10"
 
 [tool.setuptools]
-package-dir = {"" = "performance-analyzer"}
+package-dir = {"" = "performance_analyzer"}

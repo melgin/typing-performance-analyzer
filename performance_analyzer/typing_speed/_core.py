@@ -25,6 +25,10 @@ class TypingSpeedCalculator:
         """
         final_character_count = len(self.final_text) - len(self.initial_text)
         duration = self.duration - (interrupted_time / MILLISECONDS)
+
+        if duration <= 0:
+            return 0
+
         return (final_character_count - 1) / duration * WORD_PER_MINUTE
 
     def ksps(self, interrupted_time:int = 0) -> float:
@@ -36,6 +40,10 @@ class TypingSpeedCalculator:
         :return: calculated ksps value
         """
         duration = self.duration - (interrupted_time / MILLISECONDS)
+
+        if duration <= 0:
+            return 0
+
         return (len(self.data_list) - 1) / duration
 
     def get_duration(self):

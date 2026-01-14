@@ -1,4 +1,6 @@
-from performance_analyzer.typing_path.enum import TextChangePosition, TextChangeType
+from performance_analyzer.typing_path.enum import TextChangePosition, TextChangeType, EditOperationType
+from performance_analyzer.typing_path.util import EditUtil
+
 
 class TypingActivity:
 
@@ -12,7 +14,7 @@ class TypingActivity:
         self._position = None
         self._start_index = None
         self._end_index = None
-        self._edit_correction = ''
+        self._edit_correction = None
 
     @property
     def index(self):
@@ -75,11 +77,11 @@ class TypingActivity:
         self._start_index = start_index
 
     @property
-    def edit_correction(self):
+    def edit_correction(self) -> EditOperationType:
         return self._edit_correction
 
     @edit_correction.setter
-    def edit_correction(self, edit_correction):
+    def edit_correction(self, edit_correction: EditOperationType):
         self._edit_correction = edit_correction
 
 class TypingActivityHelper:
@@ -89,7 +91,7 @@ class TypingActivityHelper:
         self._current_activity = ''
         self._current_activity_start_index = 0
         self._current_activity_end_index = 0
-        self._prev_change_type = TextChangeType.ENTRY
+        self._prev_change_type = TextChangeType.INSERT
         self._prev_change_position = TextChangePosition.END
         self._initial_text = ''
         self._initial_index = 0
@@ -151,20 +153,45 @@ class TypingActivityHelper:
 
             if activity.type == TextChangeType.DELETE:
                 size -= len(activity.entered)
-                print((' ' * position) + self._visualize_space(activity.entered) + ' < ' + activity.type.name)
+                print((' ' * position) + self._visualize_space(activity.entered) + ' < ' + activity.type.name + self._get_edit_operation_name(activity))
             elif activity.type == TextChangeType.AUTO_CORRECT:
                 size -= len(activity.removed)
                 print((' ' * position) + self._visualize_space(activity.removed) + ' <<>>')
-                print((' ' * position) + self._visualize_space(activity.entered.strip()) + ' <<>> ' + activity.type.name)
+                print((' ' * position) + self._visualize_space(activity.entered.strip()) + ' <<>> ' + activity.type.name + self._get_edit_operation_name(activity))
             elif activity.type == TextChangeType.AUTO_COMPLETE:
-                print((' ' * position) + self._visualize_space(activity.entered) + ' >>>> ' + activity.type.name)
+                print((' ' * position) + self._visualize_space(activity.entered) + ' >>>> ' + activity.type.name + self._get_edit_operation_name(activity))
             else:
-                print((' ' * position) + self._visualize_space(activity.entered) + ' > ' + activity.type.name)
+                print((' ' * position) + self._visualize_space(activity.entered) + ' > ' + activity.type.name + self._get_edit_operation_name(activity))
 
             #print(self._get_activity_details(activity))
 
             if activity.type != TextChangeType.DELETE or activity.position != TextChangePosition.END:
                 size += len(activity.entered)
+
+    def _get_edit_operation_name(self, activity):
+        if activity is None or activity.edit_correction is None:
+            return ''
+        return ' (' + activity.edit_correction.name.lower() + ')'
+
+    def detect_edit_operations(self):
+        prev_activity = None
+        reversed_activity_list = self._activity_list[::-1]
+        for i in range(len(reversed_activity_list) - 1):
+            activity = reversed_activity_list[i]
+            next_activity = reversed_activity_list[i + 1]
+
+            if activity.type == TextChangeType.DELETE:
+                if prev_activity is None:
+                    activity.edit_correction = EditOperationType.REVISION
+                else:
+                    activity.edit_correction = EditUtil.get_edit_correction_status(activity, prev_activity, next_activity)
+
+            elif activity.type == TextChangeType.AUTO_CORRECT:
+                activity.edit_correction = EditOperationType.CORRECTION
+
+            prev_activity = activity
+
+
 
     @staticmethod
     def _get_activity_details(activity) -> str:

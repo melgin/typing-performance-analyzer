@@ -30,7 +30,7 @@ class TypingPathCalculator:
                 self._typing_activity.append_current_activity(change, prev_current_text, index)
 
             if change.position == TextChangePosition.END:
-                if change.type == TextChangeType.ENTRY:
+                if change.type == TextChangeType.INSERT:
                     self._typing_activity.add_to_end_of_current_activity(change.entered)
                 elif change.type == TextChangeType.AUTO_COMPLETE:
                     self._typing_activity.add_to_end_of_current_activity(change.entered)
@@ -40,7 +40,7 @@ class TypingPathCalculator:
                     self._typing_activity.append_current_activity(change, prev_current_text, index)
                     self._typing_activity.append_current_change(change, index)
             elif change.position == TextChangePosition.INSIDE:
-                if change.type == TextChangeType.ENTRY:
+                if change.type == TextChangeType.INSERT:
                     self._typing_activity.add_to_end_of_current_activity(change.entered)
                 elif change.type == TextChangeType.AUTO_COMPLETE:
                     self._typing_activity.add_to_end_of_current_activity(change.entered)
@@ -55,6 +55,9 @@ class TypingPathCalculator:
             prev = data
 
         self._typing_activity.append_current_activity(None, prev_current_text, len(self.data_list))
+
+    def detect_edit_operations(self):
+        self._typing_activity.detect_edit_operations()
 
     def print_path(self):
         self._typing_activity.print_activity()

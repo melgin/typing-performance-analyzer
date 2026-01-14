@@ -5,6 +5,13 @@ class WordChangeUtil:
 
     @staticmethod
     def get_text_change(before_text:str, current_text:str) -> TextChangeResult:
+        """
+        Calculates the change in text between two texts in word level.
+
+        :param before_text: the text before the change.
+        :param current_text: the text after the change.
+        :return: change between the two texts.
+        """
         return WordChangeUtil._get_text_change(0,
                                                StringUtil.remove_recurring_spaces(before_text),
                                                StringUtil.remove_recurring_spaces(current_text))

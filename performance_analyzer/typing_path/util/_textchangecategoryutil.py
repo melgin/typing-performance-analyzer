@@ -7,6 +7,12 @@ class TextChangeCategoryUtil:
 
     @staticmethod
     def change_type_in_keystroke(before_text, current_text, change) -> (TextChangeType, TextChangePosition):
+        """
+        :param before_text: The text before the change.
+        :param current_text: The text after the change.
+        :param change: The change in character level.
+        :return: The type and position of the change
+        """
         before_len = len(before_text)
         current_len = len(current_text)
 
@@ -15,7 +21,7 @@ class TextChangeCategoryUtil:
         elif before_len < current_len - 1 and current_text.startswith(before_text):
             return TextChangeType.AUTO_COMPLETE, TextChangePosition.END
         elif before_len < current_len and current_text.startswith(before_text):
-            return TextChangeType.ENTRY, TextChangePosition.END
+            return TextChangeType.INSERT, TextChangePosition.END
         elif before_len > current_len and before_text.startswith(current_text):
             return TextChangeType.DELETE, TextChangePosition.END
         elif before_text.endswith(change.removed) and current_text.endswith(change.entered) and change.index == before_len:
@@ -23,7 +29,7 @@ class TextChangeCategoryUtil:
         elif change.removed != '' and change.entered == '':
             return TextChangeType.DELETE, TextChangePosition.INSIDE
         elif change.removed == '' and change.entered != '' and len(change.entered) == 1:
-            return TextChangeType.ENTRY, TextChangePosition.INSIDE
+            return TextChangeType.INSERT, TextChangePosition.INSIDE
         elif change.removed == '' and change.entered != '' and len(change.entered) > 1:
             return TextChangeType.AUTO_COMPLETE, TextChangePosition.INSIDE
         elif change.removed != '' and change.entered != '':
@@ -33,6 +39,11 @@ class TextChangeCategoryUtil:
 
     @staticmethod
     def change_type(prev, data) -> (TextChangeType, TextChangeResult):
+        """
+        :param prev: Previous interaction log
+        :param data: Current interaction log
+        :return: text change between two interaction logs
+        """
         current_text = StringUtil.remove_braces(data['current_text'])
 
         if prev is not None:
@@ -48,7 +59,3 @@ class TextChangeCategoryUtil:
         change.position = change_type_position[1]
 
         return change
-
-
-
-

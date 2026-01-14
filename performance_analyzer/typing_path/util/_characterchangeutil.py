@@ -4,6 +4,13 @@ class CharacterChangeUtil:
 
     @staticmethod
     def get_text_change(before_text:str, current_text:str) -> TextChangeResult:
+        """
+        Calculates the change in text between two texts in character level.
+
+        :param before_text: the text before the change.
+        :param current_text: the text after the change.
+        :return: change between the two texts.
+        """
         return CharacterChangeUtil._get_text_change(0, before_text, current_text)
 
     @staticmethod

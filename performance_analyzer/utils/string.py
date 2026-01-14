@@ -1,6 +1,12 @@
 import re
+import os
+import string
 
+from performance_analyzer.utils.json import JsonUtil
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _RE_COMBINE_WHITESPACE = re.compile(r"\s+")
+KEYBOARD_MAP = JsonUtil.read_file(os.path.join(BASE_DIR, "keyboard.json"))
 
 class StringUtil:
 
@@ -129,8 +135,11 @@ class StringUtil:
 
     @staticmethod
     def is_adjacent(a: str, b: str) -> bool:
-        #TODO: implement
-        return False
+        characters = KEYBOARD_MAP.get(a)
+        if characters is not None and b in characters:
+            return True
+        characters = KEYBOARD_MAP.get(b)
+        return characters is not None and a in characters
 
     @staticmethod
     def _cost_of_substitution(a: str, b: str) -> int:
@@ -139,3 +148,15 @@ class StringUtil:
     @staticmethod
     def _cost_of_adjacent_substitution(a: str, b: str) -> int:
         return 0 if StringUtil.equals(a, b) or StringUtil.is_adjacent(a, b) else 1
+
+    @staticmethod
+    def remove_punctuation(text:str) -> str:
+        return text.translate(str.maketrans("", "", string.punctuation))
+
+    @staticmethod
+    def remove_consecutive_repetitions(text:str) -> str:
+        if len(text) < 2:
+            return text
+        if text[0] != text[1]:
+            return text[0] + StringUtil.remove_consecutive_repetitions(text[1:])
+        return StringUtil.remove_consecutive_repetitions(text[1:])

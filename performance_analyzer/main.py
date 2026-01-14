@@ -2,6 +2,7 @@ from performance_analyzer.error_rate import ErrorRateCalculator
 from performance_analyzer.typing_path import TypingPathCalculator
 from performance_analyzer.typing_speed import TypingSpeedCalculator
 from utils.json import JsonUtil
+import json
 
 def main():
     base = 'samples/'
@@ -41,9 +42,9 @@ def calculate_metrics(sequence:list):
     print('KSPC:', error_rate_calculator.kspc(additional_characters=0))
     print('Duration:', typing_speed_calculator.get_duration(), 'seconds')
     print('Path:')
+    typing_path_calculator.detect_edit_operations()
     typing_path_calculator.print_path()
     print('Final:\n' + typing_speed_calculator.get_final_text())
-
 
 if __name__ == "__main__":
     main()
