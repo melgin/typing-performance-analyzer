@@ -88,6 +88,7 @@ class TestStringUtil(unittest.TestCase):
         self.assertEqual(1, StringUtil.adjacent_string_distance('abc', 'ab'))
         self.assertEqual(1, StringUtil.adjacent_string_distance('abc', 'adc'))
         self.assertEqual(2, StringUtil.adjacent_string_distance('flaw', 'lawn'))
+        self.assertEqual(0, StringUtil.adjacent_string_distance('cati', 'çatı'))
         self.assertEqual(1, StringUtil.adjacent_string_distance('a', 'b'))
         self.assertEqual(3, StringUtil.adjacent_string_distance('Saturday', 'Sunday'))
         self.assertEqual(2, StringUtil.adjacent_string_distance('abcdef', 'azced'))
@@ -121,6 +122,11 @@ class TestStringUtil(unittest.TestCase):
         self.assertEqual('Sample text', StringUtil.remove_consecutive_repetitions('Sample texttttttt'))
         self.assertEqual('Sample text', StringUtil.remove_consecutive_repetitions('SSSSSSSample text'))
         self.assertEqual('Samplele text', StringUtil.remove_consecutive_repetitions('Samplele text'))
+
+    def test_convert_to_upper_case(self):
+        self.assertEqual('SAMPLE TEXT', StringUtil.convert_to_upper_case('Sample text'))
+        self.assertEqual('ABC', StringUtil.convert_to_upper_case('abc'))
+        self.assertEqual('TÜRKİYE', StringUtil.convert_to_upper_case('Türkiye'))
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,12 +1,14 @@
 import re
 import os
 import string
+import unicodedata
 
 from performance_analyzer.utils.json import JsonUtil
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 _RE_COMBINE_WHITESPACE = re.compile(r"\s+")
-KEYBOARD_MAP = JsonUtil.read_file(os.path.join(BASE_DIR, "keyboard.json"))
+KEYBOARD_MAP = JsonUtil.read_file(os.path.join(BASE_DIR, "keyboard_qwerty.json"))
+KEYBOARD_TR_MAP = JsonUtil.read_file(os.path.join(BASE_DIR, "keyboard_qwerty_turkish.json"))
 
 class StringUtil:
 
@@ -135,11 +137,21 @@ class StringUtil:
 
     @staticmethod
     def is_adjacent(a: str, b: str) -> bool:
+        a = StringUtil._to_lower_tr(a)
+        b = StringUtil._to_lower_tr(b)
         characters = KEYBOARD_MAP.get(a)
         if characters is not None and b in characters:
             return True
         characters = KEYBOARD_MAP.get(b)
-        return characters is not None and a in characters
+        if characters is not None and a in characters:
+            return True
+        characters = KEYBOARD_TR_MAP.get(a)
+        if characters is not None and b in characters:
+            return True
+        characters = KEYBOARD_TR_MAP.get(b)
+        if characters is not None and a in characters:
+            return True
+        return False
 
     @staticmethod
     def _cost_of_substitution(a: str, b: str) -> int:
@@ -148,6 +160,10 @@ class StringUtil:
     @staticmethod
     def _cost_of_adjacent_substitution(a: str, b: str) -> int:
         return 0 if StringUtil.equals(a, b) or StringUtil.is_adjacent(a, b) else 1
+
+    @staticmethod
+    def _cost_of_deasciified_substitution(a: str, b: str) -> int:
+        return 0 if StringUtil.equals(a, b) or StringUtil.is_deasciified(a, b) else 1
 
     @staticmethod
     def remove_punctuation(text:str) -> str:
@@ -160,3 +176,30 @@ class StringUtil:
         if text[0] != text[1]:
             return text[0] + StringUtil.remove_consecutive_repetitions(text[1:])
         return StringUtil.remove_consecutive_repetitions(text[1:])
+
+    @staticmethod
+    def convert_to_upper_case(text:str) -> str:
+        tr_map = str.maketrans({
+            "ı": "I",
+            "i": "İ"
+        })
+        return text.translate(tr_map).upper()
+
+    @staticmethod
+    def convert_to_lower_case(text:str) -> str:
+        return text.lower()
+
+    @staticmethod
+    def convert_to_proper_case(text:str) -> str:
+        if text == '':
+            return text
+
+        return text[0].upper() + text[1:].lower()
+
+    @staticmethod
+    def _to_lower_tr(text: str) -> str:
+        tr_map = str.maketrans({
+            "I": "ı",
+            "İ": "i"
+        })
+        return text.translate(tr_map).lower()

@@ -1,5 +1,6 @@
 from performance_analyzer.typing_path.enum import TextChangePosition, TextChangeType, EditOperationType
 from performance_analyzer.typing_path.util import EditUtil
+from utils.string import StringUtil
 
 
 class TypingActivity:
@@ -95,6 +96,9 @@ class TypingActivityHelper:
         self._prev_change_position = TextChangePosition.END
         self._initial_text = ''
         self._initial_index = 0
+        self._correction_msd = 0
+        self._revised_text_length = 0
+        self._auto_correction_msd = 0
 
     def append_current_change(self, change, index:int):
         activity = TypingActivity(change.index, change.removed, change.entered)
@@ -186,12 +190,19 @@ class TypingActivityHelper:
                 else:
                     activity.edit_correction = EditUtil.get_edit_correction_status(activity, prev_activity, next_activity)
 
+                if activity.edit_correction == EditOperationType.REVISION:
+                    self._revised_text_length += len(activity.entered)
+                elif activity.edit_correction == EditOperationType.CORRECTION:
+                    self._correction_msd += StringUtil.string_distance(prev_activity.entered, activity.entered)
+
             elif activity.type == TextChangeType.AUTO_CORRECT:
                 activity.edit_correction = EditOperationType.CORRECTION
+                self._auto_correction_msd += StringUtil.string_distance(activity.removed.strip(), activity.entered.strip())
 
             prev_activity = activity
 
-
+    def auto_correction_msd(self):
+        return self._auto_correction_msd
 
     @staticmethod
     def _get_activity_details(activity) -> str:
@@ -218,9 +229,15 @@ class TypingActivityHelper:
             return text[:-1] + '_'
         return text
 
+    def corrected_error_msd(self):
+        return self._correction_msd
+
     def add_to_end_of_current_activity(self, text):
         self._current_activity += text
 
     def add_to_start_of_current_activity(self, text):
         self._current_activity = text + self._current_activity
+
+    def get_revised_text_length(self):
+        return self._revised_text_length
 

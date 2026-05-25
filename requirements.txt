@@ -1,3 +1,4 @@
 coverage==7.12.0
 nltk==3.9.2
 phunspell==0.1.6
+lingua-language-detector=2.2.0

@@ -59,5 +59,14 @@ class TypingPathCalculator:
     def detect_edit_operations(self):
         self._typing_activity.detect_edit_operations()
 
+    def get_revised_text_length(self):
+        return self._typing_activity.get_revised_text_length()
+
+    def auto_correction_msd(self):
+        return self._typing_activity.auto_correction_msd()
+
+    def corrected_error_msd(self):
+        return self._typing_activity.corrected_error_msd()
+
     def print_path(self):
         self._typing_activity.print_activity()

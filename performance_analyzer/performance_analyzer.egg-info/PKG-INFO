@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: performance-analyzer
+Version: 1.0.0
+Summary: A Python project that analyzes the performance of a given typing sequence
+Author-email: Elgin Akpınar <elgin.akpinar@metu.edu.tr>
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
