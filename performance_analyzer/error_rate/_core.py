@@ -1,7 +1,10 @@
+import string
 from performance_analyzer.utils.string import StringUtil
 from performance_analyzer.spellcheck import SpellChecker
-import string
+from performance_analyzer.utils.session import SessionUtil
 from lingua import Language, LanguageDetectorBuilder
+
+
 languages = [Language.ENGLISH, Language.TURKISH]
 detector = LanguageDetectorBuilder.from_languages(*languages).build()
 
@@ -11,9 +14,10 @@ class ErrorRateCalculator:
     """
 
     def __init__(self, data_list:list, user_language:str):
+        self.sessions = SessionUtil.split_into_sessions(data_list)
         self.data_list = data_list
-        self.initial_text = self._get_initial_text()
-        self.final_text = self._get_final_text()
+        self.final_text = SessionUtil.get_final_text(self.data_list)
+        self.initial_text = SessionUtil.get_initial_text(self.data_list)
 
         language = detector.detect_language_of(self.final_text)
 
@@ -49,7 +53,7 @@ class ErrorRateCalculator:
         :return: calculated kspc value
         """
         session_size = len(self.data_list)
-        transcribed_text_length = (len(self.final_text) - len(self.initial_text)) + additional_characters
+        transcribed_text_length = SessionUtil.get_overall_len(self.sessions) + additional_characters
 
         if transcribed_text_length == 0:
             return 0
@@ -71,6 +75,11 @@ class ErrorRateCalculator:
                     print('WARN:', word, 'is evaluated as', result.effective_rule, 'but could not offer a corrected text!')
                 else:
                     overall_diff += StringUtil.string_distance(word, result.correct_text)
+
+        text_length = SessionUtil.get_overall_len(self.sessions)
+
+        if text_length == 0:
+            return 0
 
         return overall_diff / (len(self.final_text) - len(self.initial_text))
 
@@ -97,11 +106,4 @@ class ErrorRateCalculator:
 
     def get_final_text(self):
         return self.final_text
-
-    def _get_final_text(self) -> str:
-        current_text = self.data_list[len(self.data_list) - 1]['current_text']
-        return StringUtil.remove_braces(current_text)
-
-    def _get_initial_text(self) -> str:
-        return self.data_list[0]['before_text']
 
